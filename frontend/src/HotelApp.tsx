@@ -165,6 +165,7 @@ export default function HotelApp() {
   const filteredRooms = rooms.filter(room =>
     `${room.number} ${room.type} ${room.status}`.toLowerCase().includes(search.toLowerCase()))
   const links: { page: Page; label: string }[] = [
+    { page: 'home', label: 'Home' },
     { page: 'roomlist', label: 'Roomlist' },
     { page: 'add-room', label: 'Add Room' },
     { page: 'room-details', label: 'Room Details' },
@@ -188,7 +189,36 @@ export default function HotelApp() {
         <button disabled={loading || saving} onClick={() => void refresh()}>Refresh</button>
       </header>
       {error && <div className="alert" role="alert">{error}</div>}
-      {loading && <p role="status">Loading rooms...</p>}
+      {loading && <p role="status">Loading...</p>}
+
+      {route.page === 'home' && <section className="editor">
+        <h3>Welcome, {user?.name || 'Hotel Admin'}</h3>
+        <p>This is the hotel management dashboard. Use the navigation links above or the quick actions below to manage rooms.</p>
+        
+        {stats && <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px', margin: '15px 0' }}>
+          <div style={{ border: '1px solid #aaa', padding: '10px', background: '#fafafa' }}>
+            <strong>Total Rooms</strong>
+            <div style={{ fontSize: '22px', marginTop: '5px' }}>{stats.rooms}</div>
+          </div>
+          <div style={{ border: '1px solid #aaa', padding: '10px', background: '#fafafa' }}>
+            <strong>Occupied</strong>
+            <div style={{ fontSize: '22px', marginTop: '5px' }}>{stats.occupied_rooms}</div>
+          </div>
+          <div style={{ border: '1px solid #aaa', padding: '10px', background: '#fafafa' }}>
+            <strong>Active Bookings</strong>
+            <div style={{ fontSize: '22px', marginTop: '5px' }}>{stats.active_reservations}</div>
+          </div>
+          <div style={{ border: '1px solid #aaa', padding: '10px', background: '#fafafa' }}>
+            <strong>Total Guests</strong>
+            <div style={{ fontSize: '22px', marginTop: '5px' }}>{stats.guests}</div>
+          </div>
+        </div>}
+
+        <div className="actions" style={{ marginTop: '15px' }}>
+          <a href="#roomlist"><button type="button">View Roomlist</button></a>
+          <a href="#add-room"><button type="button">Add New Room</button></a>
+        </div>
+      </section>}
 
       {route.page === 'roomlist' && <>
         <label>Search rooms<input className="search" type="search" value={search} onChange={event => setSearch(event.target.value)} /></label>
