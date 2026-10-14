@@ -6,3 +6,9 @@ frontend/node_modules/
 frontend/dist/
 frontend/.env
 *.log
+
+# Local tool instructions and metadata
+AGENTS.md
+.agents/
+.codex/
+.openai/
