@@ -19,6 +19,9 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
   if (response.status === 204) return undefined as T
   const data = await response.json().catch(() => null)
   if (!response.ok) {
+    if (response.status === 404 && !data?.message) {
+      throw new Error('The API endpoint is unavailable. Please contact the administrator.')
+    }
     if ([502, 503, 504].includes(response.status)) {
       throw new Error(import.meta.env.DEV
         ? 'Cannot reach the Laravel API. In another terminal, run: cd backend, then php artisan serve --host=127.0.0.1 --port=8000.'
