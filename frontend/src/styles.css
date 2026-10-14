@@ -26,7 +26,7 @@ body {
   background-color: var(--bg);
 }
 
-.app-shell, .login-page {
+.app-shell {
   max-width: 960px;
   margin: 0 auto;
 }
@@ -176,11 +176,36 @@ header {
 }
 
 .login-page {
-  padding-top: 50px;
+  min-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 20px;
+  margin: 0 auto;
+}
+
+.login-page h1 {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .login-panel {
-  max-width: 380px;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+.login-panel button[type="submit"] {
+  width: 100%;
+  padding: 9px;
+  font-size: 14px;
+}
+
+.login-panel .demo {
+  text-align: center;
 }
 
 /* Forms & Inputs */
