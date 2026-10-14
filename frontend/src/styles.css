@@ -1,0 +1,113 @@
+/* Basic styling only: ordinary forms, navigation buttons, and tables. */
+body {
+  margin: 20px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: #222;
+  background: white;
+}
+
+.app-shell, .login-page {
+  max-width: 1050px;
+  margin: 0 auto;
+}
+
+h1 { font-size: 24px; }
+h2 { font-size: 20px; }
+
+nav, .header-actions, .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+button {
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+button:disabled { cursor: default; }
+nav .active { font-weight: bold; }
+
+.navbar {
+  align-items: center;
+  gap: 20px;
+  padding: 10px;
+  border: 1px solid #aaa;
+  background: #eee;
+}
+
+.logout-button { margin-left: auto; }
+
+.add-room-action {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 52px;
+  height: 52px;
+  border: 1px solid #333;
+  border-radius: 50%;
+  background: #333;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  text-decoration: none;
+}
+
+.workspace { padding-bottom: 70px; }
+fieldset { border: 0; padding: 0; max-width: 450px; }
+
+.sidebar {
+  border-bottom: 1px solid #aaa;
+  margin-bottom: 20px;
+}
+
+header, .section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.stats { margin: 20px 0; }
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 8px; border: 1px solid #aaa; text-align: left; }
+th { background: #eee; }
+.empty { text-align: center; }
+.subtext { display: block; }
+.badge, .capitalize { text-transform: capitalize; }
+.count { font-weight: normal; }
+
+.editor {
+  border: 1px solid #aaa;
+  padding: 15px;
+  margin: 15px 0;
+}
+
+.form-grid, .login-panel form {
+  max-width: 450px;
+}
+
+label {
+  display: block;
+  margin: 12px 0;
+}
+
+label input, label select, label textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 5px;
+  padding: 6px;
+  font: inherit;
+}
+
+textarea { min-height: 60px; }
+.search { padding: 6px; max-width: 100%; }
+.alert { color: #a00; margin: 15px 0; }
+.muted, .demo { color: #555; }
+.form-footer { margin-top: 15px; }
