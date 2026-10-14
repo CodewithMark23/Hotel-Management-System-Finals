@@ -17,7 +17,7 @@ The localhost proxy in `frontend/vite.config.ts` is only for ordinary `npm run d
 
 ## Database and environment
 
-An external database has not been configured yet. Login and CRUD will need database credentials, migrations, and an admin account before the deployed application can be used. The Docker image supports both MySQL and PostgreSQL; local SQLite data is excluded.
+Supabase PostgreSQL connection strings are supported. Live database credentials have not been supplied yet. Login and CRUD will need those credentials, migrations, and an admin account before the deployed application can be used. The Docker image includes `pdo_pgsql`; local SQLite data is excluded.
 
 Set these values in the Vercel project's environment settings for each deployment environment:
 
@@ -29,13 +29,41 @@ Set these values in the Vercel project's environment settings for each deploymen
 | `APP_DEBUG` | `false` |
 | `APP_TIMEZONE` | `Asia/Manila` |
 | `DB_CONNECTION` | `mysql` or `pgsql`, matching your provider |
-| `DB_URL` | Your provider's connection URL, including required TLS options |
+| `DATABASE_URL` | Supabase PostgreSQL connection URL (or use `DB_URL` for MySQL) |
 | `CACHE_STORE` | `database` |
 | `SESSION_DRIVER` | `array` (authentication uses bearer tokens) |
 | `QUEUE_CONNECTION` | `sync` |
 | `LOG_CHANNEL` | `stderr` |
 
 Alternatively, replace `DB_URL` with `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD`. Follow your provider's TLS configuration. Never commit credentials. Same-origin browser requests do not need a cross-origin CORS setting; set `FRONTEND_URL` only if you use a separately hosted frontend.
+
+### Supabase connection string
+
+Copy your project's **Session pooler** URI from the Supabase **Connect** panel. Set the following in Vercel, or in the ignored `backend/.env` for local PostgreSQL development:
+
+```ini
+DB_CONNECTION=pgsql
+DATABASE_URL="postgresql://postgres.PROJECT_REF:ENCODED_PASSWORD@POOLER_HOST:5432/postgres?sslmode=require"
+DB_SSLMODE=require
+DB_SCHEMA=hotel
+DB_EMULATE_PREPARES=false
+```
+
+Replace the host, username, and password with your copied values. Percent-encode reserved characters in the password. `DATABASE_URL` takes precedence over `DB_URL` for PostgreSQL. Keep database credentials on the backend; do not use a `VITE_` variable.
+
+Before migrating, create the dedicated application schema in Supabase's SQL Editor:
+
+```sql
+CREATE SCHEMA IF NOT EXISTS hotel;
+```
+
+`DB_SCHEMA=hotel` keeps Laravel tables in this schema, separate from Supabase's public Data API schema. Laravel Sanctum continues to handle login; no Supabase JavaScript SDK or Supabase Auth migration is needed.
+
+For the **transaction pooler** URI on port **6543**, set `DB_EMULATE_PREPARES=true` to use PDO client-side emulation. The Node/Prisma `pgbouncer=true` flag alone does not configure PHP PDO. Prefer the session pooler for migrations and schema operations.
+
+After changing a local `.env`, run `php artisan config:clear` before migrations. Local PHP also needs the `pdo_pgsql` extension; the Vercel container already installs it. The existing SQLite setup continues to work until you change your environment variables.
+
+See [Supabase's Laravel guide](https://supabase.com/docs/guides/getting-started/quickstarts/laravel) and [pooler connection documentation](https://supabase.com/docs/guides/database/connecting-to-postgres).
 
 Generate `APP_KEY` locally with `php artisan key:generate --show` inside `backend`, then enter it directly into Vercel. Use separate keys/databases for production and previews.
 
