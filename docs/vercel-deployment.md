@@ -96,4 +96,16 @@ Verify `http://localhost:8080/` renders the login page and `http://localhost:808
 
 The image excludes environment files, local vendor packages, SQLite files, and local caches. Laravel configuration is not cached during the build, so deployment environment variables are read at runtime.
 
+## Windows local PHP runtime
+
+This machine has both Herd Lite PHP and XAMPP PHP. XAMPP has PostgreSQL support enabled. For the local Laravel server, run from `backend` in your own PowerShell terminal:
+
+```powershell
+.\serve.ps1
+```
+
+The launcher sets `PHP_BINARY` to XAMPP for the server process. To use another PostgreSQL-enabled PHP installation, pass `-PhpPath 'C:\path\to\php.exe'`. Restart the server after editing `.env`, because the launcher disables automatic environment reloads. For migrations, use `C:\xampp\php\php.exe artisan migrate`.
+
+When connecting to Supabase from a tool-managed server, the process must have network access. A restricted sandbox can return Windows socket error 10013 even when the credentials are correct. A server started normally in your own terminal is outside that tool sandbox.
+
 References: [Vercel services](https://vercel.com/docs/services), [service routing](https://vercel.com/docs/services/routing), [runtime bindings](https://vercel.com/docs/services/bindings), [Laravel container setup](https://vercel.com/kb/guide/laravel-php-with-docker).
