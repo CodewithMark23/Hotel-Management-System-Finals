@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { api, getToken, setToken } from './lib/api'
-import type { Room, User } from './types'
+import type { Reservation, Room, User } from './types'
 
 type Page = 'home' | 'roomlist' | 'add-room' | 'room-details'
 
@@ -26,6 +26,7 @@ export default function HotelApp() {
   const [user, setUser] = useState<User | null>(null)
   const [route, setRoute] = useState(getRoute)
   const [rooms, setRooms] = useState<Room[]>([])
+  const [reservations, setReservations] = useState<Reservation[]>([])
   const [stats, setStats] = useState<{ rooms: number; guests: number; active_reservations: number; occupied_rooms: number; arrivals_today: number } | null>(null)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -43,6 +44,7 @@ export default function HotelApp() {
       setAuthenticated(false)
       setUser(null)
       setRooms([])
+      setReservations([])
       setEditing(false)
     }
     window.addEventListener('hashchange', navigate)
@@ -57,14 +59,16 @@ export default function HotelApp() {
     setLoading(true)
     setError('')
     try {
-      const [roomResponse, userResponse, dashResponse] = await Promise.all([
+      const [roomResponse, userResponse, dashResponse, resResponse] = await Promise.all([
         api<{ data: Room[] }>('/rooms'),
         api<{ data: User }>('/me'),
         api<{ data: { rooms: number; guests: number; active_reservations: number; occupied_rooms: number; arrivals_today: number } }>('/dashboard').catch(() => null),
+        api<{ data: Reservation[] }>('/reservations').catch(() => null),
       ])
       setRooms(roomResponse.data)
       setUser(userResponse.data)
       if (dashResponse?.data) setStats(dashResponse.data)
+      if (resResponse?.data) setReservations(resResponse.data)
     } catch (e) {
       setError((e as Error).message)
     } finally {
@@ -218,6 +222,42 @@ export default function HotelApp() {
           <a href="#roomlist"><button type="button">View Roomlist</button></a>
           <a href="#add-room"><button type="button">Add New Room</button></a>
         </div>
+
+        <div style={{ marginTop: '24px' }}>
+          <h4>Active Guest Reservations</h4>
+          {reservations.length > 0 ? (
+            <div className="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Guest Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Room</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reservations.map(res => (
+                    <tr key={res.id}>
+                      <td><strong>{res.guest?.name || 'Guest'}</strong></td>
+                      <td>{res.guest?.email || 'N/A'}</td>
+                      <td>{res.guest?.phone || 'N/A'}</td>
+                      <td>Room {res.room?.number || res.room_id}</td>
+                      <td>{res.check_in}</td>
+                      <td>{res.check_out}</td>
+                      <td><span className="status-badge badge-available">{res.status}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="demo">No reservations currently recorded.</p>
+          )}
+        </div>
       </section>}
 
       {route.page === 'roomlist' && <>
@@ -269,6 +309,40 @@ export default function HotelApp() {
             <div className="actions">
               <button disabled={loading || saving} onClick={() => setEditing(true)}>Edit Room</button>
               <button disabled={loading || saving} onClick={() => void deleteRoom(selectedRoom)}>Delete Room</button>
+            </div>
+
+            <div style={{ marginTop: '20px', borderTop: '1px solid var(--border)', paddingTop: '15px' }}>
+              <h4>Guest Bookings for Room {selectedRoom.number}</h4>
+              {reservations.filter(res => res.room_id === selectedRoom.id).length > 0 ? (
+                <div className="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Guest Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Dates</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {reservations.filter(res => res.room_id === selectedRoom.id).map(res => (
+                        <tr key={res.id}>
+                          <td><strong>{res.guest?.name}</strong></td>
+                          <td>{res.guest?.email}</td>
+                          <td>{res.guest?.phone || 'N/A'}</td>
+                          <td>{res.check_in} to {res.check_out}</td>
+                          <td>{money(res.total_amount)}</td>
+                          <td><span className="status-badge badge-available">{res.status}</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="demo">No reservations booked for this room.</p>
+              )}
             </div>
           </>}
         </section> : !loading && <p>{route.roomId ? 'Room not found.' : 'Choose a room to see its details.'}</p>}

@@ -13,7 +13,7 @@ class RoomController extends Controller
     }
     public function show(Room $room)
     {
-        return response()->json(['data' => $room]);
+        return response()->json(['data' => $room->load('reservations.guest')]);
     }
     public function store(Request $request)
     {
