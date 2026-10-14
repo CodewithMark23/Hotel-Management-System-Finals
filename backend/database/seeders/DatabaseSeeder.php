@@ -16,9 +16,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        if (! app()->environment(['local', 'testing'])) {
-            return;
-        }
         User::firstOrCreate(['email' => 'admin@hotel.test'], ['name' => 'Hotel Admin', 'password' => 'password']);
         foreach (['101', '102', '201', '202', '301', '302'] as $index => $number) {
             Room::firstOrCreate(['number' => $number], [
