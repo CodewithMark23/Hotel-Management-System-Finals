@@ -12,13 +12,17 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
       headers: { Accept: 'application/json', 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...options.headers },
     })
   } catch {
-    throw new Error('Cannot reach the API. Make sure the Laravel server is running.')
+    throw new Error(import.meta.env.DEV
+      ? 'Cannot reach the API. Make sure the Laravel server is running.'
+      : 'Cannot reach the API. Please try again later.')
   }
   if (response.status === 204) return undefined as T
   const data = await response.json().catch(() => null)
   if (!response.ok) {
     if ([502, 503, 504].includes(response.status)) {
-      throw new Error('Cannot reach the Laravel API. In another terminal, run: cd backend, then php artisan serve --host=127.0.0.1 --port=8000.')
+      throw new Error(import.meta.env.DEV
+        ? 'Cannot reach the Laravel API. In another terminal, run: cd backend, then php artisan serve --host=127.0.0.1 --port=8000.'
+        : 'The API is temporarily unavailable. Please try again later.')
     }
     if (response.status === 401) {
       setToken(null)
