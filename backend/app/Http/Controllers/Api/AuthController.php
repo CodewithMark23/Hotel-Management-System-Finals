@@ -10,12 +10,18 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        $data = $request->validate(['email' => ['required', 'email'], 'password' => ['required', 'string']]);
-        $user = User::where('email', $data['email'])->first();
-        if (! $user || ! Hash::check($data['password'], $user->password)) {
-            throw ValidationException::withMessages(['email' => ['Invalid email or password.']]);
+        try {
+            $data = $request->validate(['email' => ['required', 'email'], 'password' => ['required', 'string']]);
+            $user = User::where('email', $data['email'])->first();
+            if (! $user || ! Hash::check($data['password'], $user->password)) {
+                throw ValidationException::withMessages(['email' => ['Invalid email or password.']]);
+            }
+            return response()->json(['user' => $user, 'token' => $user->createToken('hotel-web', ['*'], now()->addHours(8))->plainTextToken]);
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            return response()->json(['message' => 'Login error: ' . $e->getMessage()], 500);
         }
-        return response()->json(['user' => $user, 'token' => $user->createToken('hotel-web', ['*'], now()->addHours(8))->plainTextToken]);
     }
     public function me(Request $request)
     {

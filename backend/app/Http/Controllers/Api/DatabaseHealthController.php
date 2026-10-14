@@ -43,7 +43,7 @@ class DatabaseHealthController extends Controller
                 return $this->failure('DATABASE_AUTHENTICATION_FAILED', 'Correct the database credentials in Vercel production environment variables.');
             }
 
-            return $this->failure('DATABASE_CONNECTION_FAILED', 'Check the database URL, network access, TLS settings, and schema in Vercel.');
+            return $this->failure('DATABASE_CONNECTION_FAILED', $exception->getMessage());
         }
 
         if (! config('app.key')) {
