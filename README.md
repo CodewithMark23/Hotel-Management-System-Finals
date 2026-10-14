@@ -104,6 +104,8 @@ Vite proxies `/api` to Laravel during development. Set `VITE_API_URL` in the fro
 
 ## Verification
 
+For the Vercel multi-service setup, see [Vercel deployment](docs/vercel-deployment.md). The repository root contains `vercel.json`; Laravel runs as a container and React builds with Vite. An external database is still required for deployment.
+
 ```powershell
 cd backend
 php artisan test
