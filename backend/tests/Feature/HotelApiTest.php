@@ -19,6 +19,15 @@ class HotelApiTest extends TestCase
         $this->getJson('/api/rooms')->assertUnauthorized();
     }
 
+    public function test_database_health_requires_an_account_and_then_reports_ready(): void
+    {
+        $this->getJson('/api/health/database')->assertStatus(503)
+            ->assertJsonPath('code', 'ADMIN_ACCOUNT_REQUIRED');
+        User::factory()->create();
+        $this->getJson('/api/health/database')->assertOk()
+            ->assertJsonPath('code', 'DATABASE_READY');
+    }
+
     public function test_login_and_logout_revoke_token(): void
     {
         User::factory()->create(['email' => 'admin@hotel.test', 'password' => 'password']);
