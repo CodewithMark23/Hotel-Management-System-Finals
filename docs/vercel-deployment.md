@@ -2,6 +2,8 @@
 
 Import the repository with its **Root Directory set to the repository root**, not `frontend` or `backend`. The root `vercel.json` builds two services:
 
+In Vercel's **Build and Deployment** settings, select the **Services** framework preset. The project needs this preset together with the `services` key in `vercel.json` to build both services.
+
 | Service | Directory | Runtime | Public paths |
 | --- | --- | --- | --- |
 | `backend` | `backend` | FrankenPHP container | `/api` and `/api/*` |
@@ -96,6 +98,18 @@ Verify `http://localhost:8080/` renders the login page and `http://localhost:808
 
 The image excludes environment files, local vendor packages, SQLite files, and local caches. Laravel configuration is not cached during the build, so deployment environment variables are read at runtime.
 
+## Deployed login returns 404
+
+If the homepage works but `/api/health` returns Vercel's `NOT_FOUND` response, verify the deployment includes the backend service. In Vercel's **Project Settings → Build and Deployment**, set **Root Directory** to the repository root (leave it blank), not `frontend`. The deployment needs to read the root `vercel.json` and build both services.
+
+Set the **Framework Preset** to **Services** in the same settings page. Selecting only Vite builds a standalone frontend rather than this service project.
+
+Remove project-level build/output overrides that apply only to `frontend`; the service-specific commands and output directory are already in `vercel.json`. Confirm the deployment uses a Git commit containing the root configuration and `backend/Dockerfile.vercel`, then create a new deployment. The build logs should include both backend and frontend builds.
+
+Configure the project environment variables from this guide, including `APP_KEY`, `APP_URL`, `APP_ENV=production`, `APP_DEBUG=false`, `DB_CONNECTION=pgsql`, `DATABASE_URL`, and `DB_SSLMODE=require`. Keep `VITE_API_URL=/api`. Verify `/api/health` returns JSON before testing login.
+
+The local `backend/.env` is intentionally ignored and is not uploaded to Vercel. Configure deployment credentials in Vercel's environment settings.
+
 ## Windows local PHP runtime
 
 This machine has both Herd Lite PHP and XAMPP PHP. XAMPP has PostgreSQL support enabled. For the local Laravel server, run from `backend` in your own PowerShell terminal:
@@ -108,4 +122,4 @@ The launcher sets `PHP_BINARY` to XAMPP for the server process. To use another P
 
 When connecting to Supabase from a tool-managed server, the process must have network access. A restricted sandbox can return Windows socket error 10013 even when the credentials are correct. A server started normally in your own terminal is outside that tool sandbox.
 
-References: [Vercel services](https://vercel.com/docs/services), [service routing](https://vercel.com/docs/services/routing), [runtime bindings](https://vercel.com/docs/services/bindings), [Laravel container setup](https://vercel.com/kb/guide/laravel-php-with-docker).
+References: [Vercel services](https://vercel.com/docs/services), [services project settings](https://vercel.com/kb/guide/vercel-services), [service routing](https://vercel.com/docs/services/routing), [runtime bindings](https://vercel.com/docs/services/bindings), [Laravel container setup](https://vercel.com/kb/guide/laravel-php-with-docker).
