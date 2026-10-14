@@ -110,6 +110,23 @@ Configure the project environment variables from this guide, including `APP_KEY`
 
 The local `backend/.env` is intentionally ignored and is not uploaded to Vercel. Configure deployment credentials in Vercel's environment settings.
 
+## Deployed login returns 500
+
+Open `/api/health/database` on the deployed domain. This endpoint checks the database connection, login tables, database cache table when used, whether any user account exists, and the application key. It returns only fixed error codes and messages, never credentials or exception traces.
+
+| Code | Action |
+| --- | --- |
+| `DATABASE_READY` | The dependencies checked by this endpoint are available; inspect the failed login's application log for other errors. |
+| `DATABASE_NOT_CONFIGURED` | Set `DB_CONNECTION=pgsql` and `DATABASE_URL` for the Vercel production environment. |
+| `DATABASE_DRIVER_MISSING` | Deploy the backend using the supplied Dockerfile with its PostgreSQL extension. |
+| `DATABASE_AUTHENTICATION_FAILED` | Correct the database password in the deployment connection URL. |
+| `DATABASE_CONNECTION_FAILED` | Check the connection URL, network access, TLS, and database schema. |
+| `MIGRATIONS_REQUIRED` | Apply migrations to the deployment database and schema. |
+| `ADMIN_ACCOUNT_REQUIRED` | Create a Laravel admin account in that database. |
+| `APP_KEY_MISSING` | Set a stable Laravel `APP_KEY` in the deployment environment. |
+
+Failures return HTTP 503; the ordinary `/api/health` liveness endpoint still returns HTTP 200 while Laravel can serve requests. Environment changes require a new deployment. This endpoint is available only after deploying the commit that adds it.
+
 ## Windows local PHP runtime
 
 This machine has both Herd Lite PHP and XAMPP PHP. XAMPP has PostgreSQL support enabled. For the local Laravel server, run from `backend` in your own PowerShell terminal:

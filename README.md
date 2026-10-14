@@ -59,6 +59,7 @@ Base URL: `http://127.0.0.1:8000/api`. Send `Accept: application/json` and `Cont
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
 | GET | `/health` | Public health check |
+| GET | `/health/database` | Public database readiness check with safe error codes |
 | POST | `/login` | Email/password login; returns user and token |
 | GET | `/me` | Current user |
 | POST | `/logout` | Revoke current token |
@@ -66,7 +67,7 @@ Base URL: `http://127.0.0.1:8000/api`. Send `Accept: application/json` and `Cont
 | GET / POST | `/rooms`, `/guests`, `/reservations` | List / create |
 | GET / PUT / DELETE | `/rooms/{id}`, `/guests/{id}`, `/reservations/{id}` | Read / update / delete |
 
-All routes except health/login require `Authorization: Bearer <token>`. Updates use the full form payload. Successful resource responses use `{ "data": ... }`; validation failures return HTTP 422 with `message` and `errors`. Lists are intentionally unpaginated for this starter.
+All routes except the health checks and login require `Authorization: Bearer <token>`. Updates use the full form payload. Successful resource responses use `{ "data": ... }`; validation failures return HTTP 422 with `message` and `errors`. Lists are intentionally unpaginated for this starter.
 
 Example reservation payload:
 
