@@ -155,7 +155,7 @@ export default function HotelApp() {
         {error && <div className="alert" role="alert">{error}</div>}
         <label>Email<input name="email" type="email" autoComplete="username" defaultValue="admin@hotel.test" required /></label>
         <label>Password<input name="password" type="password" autoComplete="current-password" required /></label>
-        <button disabled={saving}>{saving ? 'Signing in...' : 'Sign in'}</button>
+        <button type="submit" disabled={saving}>{saving ? 'Signing in...' : 'Sign in'}</button>
         <p className="demo">Local demo: admin@hotel.test / password</p>
       </form>
     </section>
@@ -182,7 +182,7 @@ export default function HotelApp() {
       >{link.label}</a>)}
       <button className="logout-button" onClick={() => void logout()} disabled={saving}>Logout</button>
     </nav>
-    <p>Logged in as {user?.name || 'Admin'}</p>
+    <p className="user-status">Logged in as <strong>{user?.name || 'Admin'}</strong></p>
     <main className="workspace">
       <header>
         <h2>{links.find(link => link.page === route.page)?.label}</h2>
@@ -195,22 +195,22 @@ export default function HotelApp() {
         <h3>Welcome, {user?.name || 'Hotel Admin'}</h3>
         <p>This is the hotel management dashboard. Use the navigation links above or the quick actions below to manage rooms.</p>
         
-        {stats && <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px', margin: '15px 0' }}>
-          <div style={{ border: '1px solid #aaa', padding: '10px', background: '#fafafa' }}>
-            <strong>Total Rooms</strong>
-            <div style={{ fontSize: '22px', marginTop: '5px' }}>{stats.rooms}</div>
+        {stats && <div className="stats-grid">
+          <div className="stat-card">
+            <span className="stat-label">Total Rooms</span>
+            <div className="stat-value">{stats.rooms}</div>
           </div>
-          <div style={{ border: '1px solid #aaa', padding: '10px', background: '#fafafa' }}>
-            <strong>Occupied</strong>
-            <div style={{ fontSize: '22px', marginTop: '5px' }}>{stats.occupied_rooms}</div>
+          <div className="stat-card">
+            <span className="stat-label">Occupied</span>
+            <div className="stat-value">{stats.occupied_rooms}</div>
           </div>
-          <div style={{ border: '1px solid #aaa', padding: '10px', background: '#fafafa' }}>
-            <strong>Active Bookings</strong>
-            <div style={{ fontSize: '22px', marginTop: '5px' }}>{stats.active_reservations}</div>
+          <div className="stat-card">
+            <span className="stat-label">Active Bookings</span>
+            <div className="stat-value">{stats.active_reservations}</div>
           </div>
-          <div style={{ border: '1px solid #aaa', padding: '10px', background: '#fafafa' }}>
-            <strong>Total Guests</strong>
-            <div style={{ fontSize: '22px', marginTop: '5px' }}>{stats.guests}</div>
+          <div className="stat-card">
+            <span className="stat-label">Total Guests</span>
+            <div className="stat-value">{stats.guests}</div>
           </div>
         </div>}
 
@@ -227,11 +227,11 @@ export default function HotelApp() {
             <thead><tr><th>Room</th><th>Type</th><th>Nightly Rate</th><th>Capacity</th><th>Status</th><th>Action</th></tr></thead>
             <tbody>
               {filteredRooms.map(room => <tr key={room.id}>
-                <td>{room.number}</td>
+                <td><strong>{room.number}</strong></td>
                 <td className="capitalize">{room.type}</td>
                 <td>{money(room.rate)}</td>
                 <td>{room.capacity}</td>
-                <td>{room.status === 'available' ? 'In service' : 'Maintenance'}</td>
+                <td><span className={`status-badge ${room.status === 'available' ? 'badge-available' : 'badge-maintenance'}`}>{room.status === 'available' ? 'In service' : 'Maintenance'}</span></td>
                 <td><a href={`#room-details/${room.id}`}>View Details</a></td>
               </tr>)}
               {!loading && !filteredRooms.length && <tr><td colSpan={6}>No rooms found.</td></tr>}
@@ -265,7 +265,7 @@ export default function HotelApp() {
             <p>Type: <span className="capitalize">{selectedRoom.type}</span></p>
             <p>Nightly Rate: {money(selectedRoom.rate)}</p>
             <p>Capacity: {selectedRoom.capacity} guests</p>
-            <p>Status: {selectedRoom.status === 'available' ? 'In service' : 'Maintenance'}</p>
+            <p>Status: <span className={`status-badge ${selectedRoom.status === 'available' ? 'badge-available' : 'badge-maintenance'}`}>{selectedRoom.status === 'available' ? 'In service' : 'Maintenance'}</span></p>
             <div className="actions">
               <button disabled={loading || saving} onClick={() => setEditing(true)}>Edit Room</button>
               <button disabled={loading || saving} onClick={() => void deleteRoom(selectedRoom)}>Delete Room</button>
